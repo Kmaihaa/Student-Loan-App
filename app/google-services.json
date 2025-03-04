@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "953192612064",
+    "project_id": "student-loan-app-165f3",
+    "storage_bucket": "student-loan-app-165f3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:953192612064:android:fdb2580ede262ae04c9085",
+        "android_client_info": {
+          "package_name": "com.example.student_loan_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQ-V2HU-f8qlijcemkXCsiNH0Cjjc7NSo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
