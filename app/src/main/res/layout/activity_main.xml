@@ -6,23 +6,23 @@
     android:id="@+id/mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    tools:ignore="ExtraText">
+    tools:context=".MainActivity">
 
-    <!-- Top Welcome Message -->
+    <!-- Welcome Text -->
+
+    <!-- Progress Bar -->
     <TextView
         android:id="@+id/textViewWelcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome, User"
-        android:textSize="20sp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="16dp"
+        android:text="Welcome User"
+        android:textSize="48sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Progress Bar beneath the Welcome Text -->
     <ProgressBar
         android:id="@+id/progressBarDebtRepayment"
         style="@style/Widget.MaterialComponents.LinearProgressIndicator"
@@ -31,79 +31,74 @@
         android:indeterminate="false"
         android:progress="50"
         android:max="100"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textViewWelcome"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textViewWelcome"/>
 
-    <!-- Placeholder for Pie Chart in the Top-Right -->
-    <!-- You can use a library like MPAndroidChart or a custom view -->
+    <!-- Pie Chart Image -->
     <ImageView
         android:id="@+id/imageViewPieChart"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:contentDescription="Pie Chart Placeholder"
-        android:src="@drawable/ic_pie_chart_placeholder"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="175dp"
+        android:layout_height="160dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"/>
+        android:src="@drawable/ic_pie_chart_placeholder"
+        app:layout_constraintTop_toBottomOf="@id/progressBarDebtRepayment"
+        app:layout_constraintStart_toStartOf="parent"/>
 
-    <!-- Balance Display with Eye Icon -->
-    <LinearLayout
-        android:id="@+id/layoutBalance"
+    <!-- Balance Label -->
+
+    <!-- Balance Amount -->
+
+    <TextView
+        android:id="@+id/textViewBalanceLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_marginStart="52dp"
+        android:text="Balance"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/imageViewPieChart"
+        app:layout_constraintTop_toTopOf="@id/imageViewPieChart" />
+
+    <!-- Eye Icon -->
+
+    <!-- Horizontal Progress Bar -->
+
+    <TextView
+        android:id="@+id/textViewBalanceAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="16dp"
+        android:text="$10000"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@id/textViewBalanceLabel"
+        app:layout_constraintTop_toBottomOf="@id/textViewBalanceLabel" />
+
+    <ImageView
+        android:id="@+id/imageViewToggleBalance"
+        android:layout_width="30dp"
+        android:layout_height="29dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:src="@drawable/ic_eye_open"
+        app:layout_constraintStart_toEndOf="@id/textViewBalanceAmount"
+        app:layout_constraintTop_toTopOf="@id/textViewBalanceAmount" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="68dp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imageViewPieChart"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp">
+        android:layout_margin="16dp"/>
 
-        <TextView
-            android:id="@+id/textViewBalanceLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Balance:"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginEnd="8dp"/>
-
-        <TextView
-            android:id="@+id/textViewBalanceAmount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="$12,345.67"
-            android:textSize="16sp"
-            android:layout_marginEnd="8dp"/>
-
-        <ImageView
-            android:id="@+id/imageViewToggleBalance"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_eye_open"
-            android:contentDescription="Toggle Balance Visibility"/>
-    </LinearLayout>
-
-    <!-- Fragment/Container for Additional Content (Optional) -->
-    <!-- You can use this container to swap in different fragments if needed -->
-
-    <!-- Bottom Navigation Bar -->
-    <FrameLayout
-        android:id="@+id/fragmentContainer"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/progressBarDebtRepayment"
-        app:layout_constraintVertical_bias="1.0"/>
-
+    <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="0dp"
