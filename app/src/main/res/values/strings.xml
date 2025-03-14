@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">Student-Loan-App</string>
+    <string-array name="repayment_plans">
+        <item>Standard</item>
+        <item>Graduated</item>
+        <item>Income-driven</item>
+    </string-array>
+    <string-array name="compound_frequencies">
+        <item>Annually (APY)</item>
+        <item>Semi-annually</item>
+        <item>Quarterly</item>
+        <item>Monthly (APR)</item>
+        <item>Semi-monthly</item>
+        <item>Biweekly</item>
+        <item>Weekly</item>
+        <item>Daily</item>
+        <item>Continuously</item>
+    </string-array>
 </resources>
