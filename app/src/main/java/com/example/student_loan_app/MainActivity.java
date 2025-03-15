@@ -71,8 +71,10 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 } else if (id == R.id.navigation_budget) {
                     // Navigate to Budget & Expense Management
+                    Intent intent = new Intent(MainActivity.this, BudgetExpenseActivity.class);
+                    startActivity(intent);
                     return true;
-                } else if (id == R.id.navigation_notifications) {
+                }   else if (id == R.id.navigation_notifications) {
                     // Navigate to Notifications
                     return true;
                 } else if (id == R.id.navigation_profile) {
