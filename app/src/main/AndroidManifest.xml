@@ -30,6 +30,7 @@
 
         </activity>
         <activity android:name=".ProfileActivity" />
+        <activity android:name=".BudgetExpenseActivity" />
     </application>
 
 </manifest>
