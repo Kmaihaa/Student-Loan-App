@@ -13,6 +13,22 @@
         android:theme="@style/Theme.StudentLoanApp"
         tools:targetApi="31">
         <activity
+            android:name=".RepaymentEstimatorActivity"
+            android:exported="false"
+            android:theme="@style/Theme.StudentLoanApp" />
+        <activity
+            android:name=".LoanCalculatorActivity"
+            android:exported="false" />
+        <activity
+            android:name=".InteractiveToolsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EducationalContentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FinancialLiteracyActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="false" />
         <activity
@@ -26,9 +42,7 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:exported="false">
-
-        </activity>
+            android:exported="false" />
     </application>
 
 </manifest>

@@ -11,7 +11,7 @@ import java.text.DecimalFormat;
 public class RepaymentEstimatorActivity extends AppCompatActivity {
 
     private EditText loanAmountInput, interestRateInput, monthlyPaymentInput;
-    private Button calculateButton, btnBackToInteractiveTools;
+    private Button calculateButton, btnBackToMenu;
     private TextView resultText;
 
     @Override
@@ -24,10 +24,11 @@ public class RepaymentEstimatorActivity extends AppCompatActivity {
         monthlyPaymentInput = findViewById(R.id.monthlyPaymentInput);
         calculateButton = findViewById(R.id.calculateButton);
         resultText = findViewById(R.id.resultText);
-        btnBackToInteractiveTools = findViewById(R.id.btnBackToInteractiveTools);
+        Button btnBackToMenu = findViewById(R.id.btnBackToMenu);
+
 
         calculateButton.setOnClickListener(v -> estimateRepaymentTime());
-        btnBackToInteractiveTools.setOnClickListener(v -> finish()); // Return to Interactive Tools
+        btnBackToMenu.setOnClickListener(v -> finish());
     }
 
     private void estimateRepaymentTime() {

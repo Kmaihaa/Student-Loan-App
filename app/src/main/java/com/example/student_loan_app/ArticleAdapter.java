@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,16 +21,17 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleV
     @NonNull
     @Override
     public ArticleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.article_item, parent, false);
         return new ArticleViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ArticleViewHolder holder, int position) {
         Article article = articles.get(position);
-        holder.textView.setText(article.getTitle());
+        holder.title.setText(article.getTitle());
 
-        holder.itemView.setOnClickListener(v -> {
+        holder.visitButton.setOnClickListener(v -> {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(article.getUrl()));
             v.getContext().startActivity(browserIntent);
         });
@@ -41,10 +43,13 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ArticleV
     }
 
     static class ArticleViewHolder extends RecyclerView.ViewHolder {
-        TextView textView;
+        TextView title;
+        Button visitButton;
+
         ArticleViewHolder(View itemView) {
             super(itemView);
-            textView = itemView.findViewById(android.R.id.text1);
+            title = itemView.findViewById(R.id.articleTitle);
+            visitButton = itemView.findViewById(R.id.btnVisitArticle);
         }
     }
 }

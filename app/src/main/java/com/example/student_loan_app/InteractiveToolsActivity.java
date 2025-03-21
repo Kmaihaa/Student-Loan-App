@@ -1,5 +1,6 @@
 package com.example.student_loan_app;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -11,8 +12,9 @@ public class InteractiveToolsActivity extends AppCompatActivity {
 
     private Button btnLoanCalculator;
     private Button btnRepaymentEstimator;
-    private Button btnBackToFinancialLiteracy;
+    private Button btnBackToMenu;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,7 +22,7 @@ public class InteractiveToolsActivity extends AppCompatActivity {
 
         btnLoanCalculator = findViewById(R.id.btnLoanCalculator);
         btnRepaymentEstimator = findViewById(R.id.btnRepaymentEstimator);
-        btnBackToFinancialLiteracy = findViewById(R.id.btnBackToFinancialLiteracy);
+        btnBackToMenu = findViewById(R.id.btnBackToMenu);
 
         btnLoanCalculator.setOnClickListener(v -> {
             Intent intent = new Intent(InteractiveToolsActivity.this, LoanCalculatorActivity.class);
@@ -32,6 +34,8 @@ public class InteractiveToolsActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        btnBackToFinancialLiteracy.setOnClickListener(v -> finish());
+
+        btnBackToMenu.setOnClickListener(v -> finish());
+
     }
 }
