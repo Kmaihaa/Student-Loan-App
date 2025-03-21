@@ -1,17 +1,18 @@
 package com.example.student_loan_app;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,12 +27,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
+import androidx.annotation.Nullable;
 
 public class BudgetExpenseActivity extends AppCompatActivity {
 
@@ -41,18 +43,17 @@ public class BudgetExpenseActivity extends AppCompatActivity {
     private TextView textViewMonthlyIncome, textViewLoanRepaymentSuggestion, textViewExpenseSuggestion;
     private PieChart pieChartBudget;
     private EditText editTextExpenseName, editTextExpenseAmount;
-    private Button buttonAddExpense;
     private RecyclerView recyclerViewExpenses;
 
     // Firebase
     private FirebaseFirestore db;
     private FirebaseAuth auth;
 
-    // RecyclerView Adapter
+    // Adapter and expense list with document IDs
     private ExpenseAdapter expenseAdapter;
-    private List<Expense> expenseList = new ArrayList<>();
+    private List<ExpenseItem> expenseItemList = new ArrayList<>();
 
-    // User Profile
+    // User profile
     private Profile userProfile;
 
     @Override
@@ -60,26 +61,35 @@ public class BudgetExpenseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_budget_expense);
 
-        // Initialize Firebase instances
+        // Initialize Firebase
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        // Bind UI Views
+        // Bind UI views
         textViewMonthlyIncome = findViewById(R.id.textViewMonthlyIncome);
         textViewLoanRepaymentSuggestion = findViewById(R.id.textViewLoanRepaymentSuggestion);
         textViewExpenseSuggestion = findViewById(R.id.textViewExpenseSuggestion);
         pieChartBudget = findViewById(R.id.pieChartBudget);
         editTextExpenseName = findViewById(R.id.editTextExpenseName);
         editTextExpenseAmount = findViewById(R.id.editTextExpenseAmount);
-        buttonAddExpense = findViewById(R.id.buttonAddExpense);
         recyclerViewExpenses = findViewById(R.id.recyclerViewExpenses);
 
-        // Set up RecyclerView
+        // Setup RecyclerView
         recyclerViewExpenses.setLayoutManager(new LinearLayoutManager(this));
-        expenseAdapter = new ExpenseAdapter(expenseList);
+        expenseAdapter = new ExpenseAdapter(expenseItemList, new ExpenseAdapter.OnExpenseItemClickListener() {
+            @Override
+            public void onEditExpense(ExpenseItem expenseItem) {
+                showEditExpenseDialog(expenseItem);
+            }
+
+            @Override
+            public void onDeleteExpense(ExpenseItem expenseItem) {
+                showDeleteExpenseDialog(expenseItem);
+            }
+        });
         recyclerViewExpenses.setAdapter(expenseAdapter);
 
-        // Set up Bottom Navigation
+        // Setup Bottom Navigation
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener(){
             @Override
@@ -89,13 +99,13 @@ public class BudgetExpenseActivity extends AppCompatActivity {
                     startActivity(new Intent(BudgetExpenseActivity.this, MainActivity.class));
                     return true;
                 } else if (id == R.id.navigation_repayment_planner) {
-                    // TODO: start Repayment Planner Activity
+                    // TODO: Start Repayment Planner Activity
                     return true;
                 } else if (id == R.id.navigation_budget) {
-                    // Already on Budget page
+                    // Already here
                     return true;
                 } else if (id == R.id.navigation_notifications) {
-                    // TODO: start Notifications Activity
+                    // TODO: Start Notifications Activity
                     return true;
                 } else if (id == R.id.navigation_profile) {
                     startActivity(new Intent(BudgetExpenseActivity.this, ProfileActivity.class));
@@ -105,17 +115,17 @@ public class BudgetExpenseActivity extends AppCompatActivity {
             }
         });
 
-        // Load user profile and expenses
+        // Load user profile and expense data
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser != null) {
             loadProfileData(currentUser.getUid());
-            loadExpenses(currentUser.getUid());
+            listenToExpenses(currentUser.getUid());
         } else {
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
         }
 
-        // Set listener for adding an expense
-        buttonAddExpense.setOnClickListener(new View.OnClickListener(){
+        // Set listener for adding a new expense
+        findViewById(R.id.buttonAddExpense).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 FirebaseUser user = auth.getCurrentUser();
@@ -128,14 +138,14 @@ public class BudgetExpenseActivity extends AppCompatActivity {
         });
     }
 
-    // Load profile data from Firestore
+    // Load profile data from Firestore once
     private void loadProfileData(String uid) {
         DocumentReference docRef = db.collection("profile").document(uid);
         docRef.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 userProfile = documentSnapshot.toObject(Profile.class);
                 if (userProfile != null) {
-                    updateBudgetUI(userProfile);
+                    updateBudgetUI();
                 }
             } else {
                 Log.d(TAG, "No profile document found.");
@@ -145,27 +155,60 @@ public class BudgetExpenseActivity extends AppCompatActivity {
         });
     }
 
-    // Update UI elements and PieChart based on profile data
-    private void updateBudgetUI(Profile profile) {
-        double monthlyIncome = profile.getMonthlyIncome();
-        double interestRate = profile.getInterestRate();
+    // Listen to expenses collection in real-time
+    private void listenToExpenses(String uid) {
+        CollectionReference expensesRef = db.collection("profile").document(uid).collection("expenses");
+        expensesRef.orderBy("timestamp").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot snapshots,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.e(TAG, "Listen failed.", e);
+                    return;
+                }
+                expenseItemList.clear();
+                if (snapshots != null) {
+                    for (var doc : snapshots.getDocuments()) {
+                        Expense expense = doc.toObject(Expense.class);
+                        String docId = doc.getId();
+                        expenseItemList.add(new ExpenseItem(expense, docId));
+                    }
+                    expenseAdapter.notifyDataSetChanged();
+                    // Update chart based on expense changes
+                    updateBudgetUI();
+                }
+            }
+        });
+    }
 
-        // Real-world logic:
-        // If interest rate > 5%, allocate 15% of income for loan repayment; otherwise, 10%.
+    // Update the UI (TextViews and PieChart) using profile data and expense totals
+    private void updateBudgetUI() {
+        if (userProfile == null) return;
+
+        double monthlyIncome = userProfile.getMonthlyIncome();
+        double interestRate = userProfile.getInterestRate();
+
+        // Calculate loan repayment suggestion (real-world logic)
         double loanRepaymentSuggestion = (interestRate > 5.0) ? monthlyIncome * 0.15 : monthlyIncome * 0.10;
-        double expenseSuggestion = monthlyIncome * 0.50;
-        double savings = monthlyIncome - (loanRepaymentSuggestion + expenseSuggestion);
+        // Sum actual expenses from the expense list
+        double totalExpenses = 0.0;
+        for (ExpenseItem item : expenseItemList) {
+            totalExpenses += item.getExpense().getAmount();
+        }
+        // Calculate remaining savings
+        double savings = monthlyIncome - (loanRepaymentSuggestion + totalExpenses);
 
-        // Update TextViews with formatted values
+        // Update TextViews
         textViewMonthlyIncome.setText("Monthly Income: $" + String.format("%.2f", monthlyIncome));
         textViewLoanRepaymentSuggestion.setText("Recommended Loan Payment: $" + String.format("%.2f", loanRepaymentSuggestion));
-        textViewExpenseSuggestion.setText("Suggested Expense Budget: $" + String.format("%.2f", expenseSuggestion));
+        textViewExpenseSuggestion.setText("Total Expenses: $" + String.format("%.2f", totalExpenses) +
+                "\nRemaining Savings: $" + String.format("%.2f", savings));
 
-        // Set up entries for the PieChart
+        // Update PieChart entries
         List<PieEntry> entries = new ArrayList<>();
         entries.add(new PieEntry((float) loanRepaymentSuggestion, "Loan Repayment"));
-        entries.add(new PieEntry((float) expenseSuggestion, "Expenses"));
-        entries.add(new PieEntry((float) savings, "Savings/Discretionary"));
+        entries.add(new PieEntry((float) totalExpenses, "Expenses"));
+        entries.add(new PieEntry((float) savings, "Savings"));
 
         PieDataSet dataSet = new PieDataSet(entries, "Budget Allocation");
         dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
@@ -180,7 +223,7 @@ public class BudgetExpenseActivity extends AppCompatActivity {
         pieChartBudget.invalidate(); // refresh chart
     }
 
-    // Add an expense to Firestore
+    // Add an expense (creates a new expense document)
     private void addExpense(String uid) {
         String expenseName = editTextExpenseName.getText().toString().trim();
         String expenseAmountStr = editTextExpenseAmount.getText().toString().trim();
@@ -198,28 +241,82 @@ public class BudgetExpenseActivity extends AppCompatActivity {
                 .add(expense)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(BudgetExpenseActivity.this, "Expense added", Toast.LENGTH_SHORT).show();
-                    loadExpenses(uid);  // Refresh the list after adding
+                    // The snapshot listener will update the list and chart
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(BudgetExpenseActivity.this, "Error adding expense: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
-    // Load all expenses from Firestore for the current user
-    private void loadExpenses(String uid) {
-        CollectionReference expensesRef = db.collection("profile").document(uid).collection("expenses");
-        expensesRef.orderBy("timestamp", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    expenseList.clear();
-                    for (QueryDocumentSnapshot doc : querySnapshot) {
-                        Expense expense = doc.toObject(Expense.class);
-                        expenseList.add(expense);
-                    }
-                    expenseAdapter.notifyDataSetChanged();
+    // Show a confirmation dialog and delete the expense if confirmed
+    private void showDeleteExpenseDialog(ExpenseItem expenseItem) {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Expense")
+                .setMessage("Are you sure you want to delete this expense?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    deleteExpense(expenseItem);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    // Delete the expense from Firestore
+    private void deleteExpense(ExpenseItem expenseItem) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) return;
+        db.collection("profile").document(user.getUid())
+                .collection("expenses").document(expenseItem.getDocId())
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(BudgetExpenseActivity.this, "Expense deleted", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error loading expenses", e);
+                    Toast.makeText(BudgetExpenseActivity.this, "Error deleting expense: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    // Show an edit dialog to update the expense details
+    private void showEditExpenseDialog(ExpenseItem expenseItem) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Edit Expense");
+
+        // Create input fields for expense name and amount
+        View viewInflated = getLayoutInflater().inflate(R.layout.dialog_edit_expense, null);
+        final EditText inputName = viewInflated.findViewById(R.id.editTextDialogExpenseName);
+        final EditText inputAmount = viewInflated.findViewById(R.id.editTextDialogExpenseAmount);
+
+        // Pre-fill with current values
+        inputName.setText(expenseItem.getExpense().getName());
+        inputAmount.setText(String.valueOf(expenseItem.getExpense().getAmount()));
+
+        builder.setView(viewInflated);
+
+        builder.setPositiveButton("Update", (dialog, which) -> {
+            String newName = inputName.getText().toString().trim();
+            String newAmountStr = inputAmount.getText().toString().trim();
+            if (newName.isEmpty() || newAmountStr.isEmpty()) {
+                Toast.makeText(BudgetExpenseActivity.this, "Fields cannot be empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            double newAmount = Double.parseDouble(newAmountStr);
+            updateExpense(expenseItem, newName, newAmount);
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+    // Update an expense document with new values
+    private void updateExpense(ExpenseItem expenseItem, String newName, double newAmount) {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) return;
+        DocumentReference expenseDoc = db.collection("profile").document(user.getUid())
+                .collection("expenses").document(expenseItem.getDocId());
+        expenseDoc.update("name", newName, "amount", newAmount)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(BudgetExpenseActivity.this, "Expense updated", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(BudgetExpenseActivity.this, "Error updating expense: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 }
