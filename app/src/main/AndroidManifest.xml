@@ -29,7 +29,6 @@
             android:exported="false">
 
         </activity>
-        <activity android:name=".ProfileActivity" />
     </application>
 
 </manifest>
