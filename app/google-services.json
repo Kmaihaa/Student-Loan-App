@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "953192612064",
+    "firebase_url": "https://student-loan-app-165f3-default-rtdb.firebaseio.com",
     "project_id": "student-loan-app-165f3",
     "storage_bucket": "student-loan-app-165f3.firebasestorage.app"
   },

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +30,21 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("profile").limit(1).get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        Log.d("FirestoreTest", "Connection Successful! Data exists.");
+                    } else {
+                        Log.d("FirestoreTest", "Connected, but no data found.");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("FirestoreTest", "Connection failed", e);
+                });
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -54,12 +71,16 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 } else if (id == R.id.navigation_budget) {
                     // Navigate to Budget & Expense Management
+                    Intent intent = new Intent(MainActivity.this, BudgetExpenseActivity.class);
+                    startActivity(intent);
                     return true;
-                } else if (id == R.id.navigation_notifications) {
+                }   else if (id == R.id.navigation_notifications) {
                     // Navigate to Notifications
                     return true;
                 } else if (id == R.id.navigation_profile) {
                     // Navigate to Profile
+                    Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                    startActivity(intent);
                     return true;
                 } else {
                     return false;
