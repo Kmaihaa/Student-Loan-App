@@ -14,7 +14,7 @@ public class LoanCalculatorActivity extends AppCompatActivity {
     private EditText loanAmountInput, interestRateInput, loanTermInput;
     private Button calculateButton;
     private TextView resultText;
-    private Button btnBackToInteractiveTools;
+    private Button btnBackToMenu;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -27,17 +27,18 @@ public class LoanCalculatorActivity extends AppCompatActivity {
         loanTermInput = findViewById(R.id.loanTermInput);
         calculateButton = findViewById(R.id.calculateButton);
         resultText = findViewById(R.id.resultText);
-        btnBackToInteractiveTools = findViewById(R.id.btnBackToInteractiveTools);
+        btnBackToMenu = findViewById(R.id.btnBackToMenu);
 
         calculateButton.setOnClickListener(v -> calculateLoanPayment());
 
-        btnBackToInteractiveTools.setOnClickListener(v -> finish()); // Return to Interactive Tools
+        btnBackToMenu.setOnClickListener(v -> finish());
     }
 
     private void calculateLoanPayment() {
         String loanAmountStr = loanAmountInput.getText().toString();
         String interestRateStr = interestRateInput.getText().toString();
         String loanTermStr = loanTermInput.getText().toString();
+
 
         if (loanAmountStr.isEmpty() || interestRateStr.isEmpty() || loanTermStr.isEmpty()) {
             resultText.setText("Please fill in all fields");
@@ -62,4 +63,7 @@ public class LoanCalculatorActivity extends AppCompatActivity {
         DecimalFormat df = new DecimalFormat("#.##");
         resultText.setText("Estimated Monthly Payment: $" + df.format(monthlyPayment));
     }
+
+
+
 }
