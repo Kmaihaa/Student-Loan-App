@@ -3,9 +3,11 @@ package com.example.student_loan_app;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,6 +21,11 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageViewToggleBalance;
     private boolean isBalanceVisible = true;  // Track whether the balance is shown or hidden
 
+    private Button btnFinancialLiteracy;
+    private Button interactiveToolsButton;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         textViewBalanceAmount = findViewById(R.id.textViewBalanceAmount);
         imageViewToggleBalance = findViewById(R.id.imageViewToggleBalance);
+
+        btnFinancialLiteracy = findViewById(R.id.btnFinancialLiteracy);
+
+
 
         // 2. Set up the item selected listener
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
@@ -55,6 +66,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        btnFinancialLiteracy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, FinancialLiteracyActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
 
         // 3. Toggle Balance Visibility
         imageViewToggleBalance.setOnClickListener(new View.OnClickListener() {
