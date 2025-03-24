@@ -67,7 +67,8 @@ public class MainActivity extends AppCompatActivity {
                     // Navigate to Home
                     return true;
                 } else if (id == R.id.navigation_repayment_planner) {
-                    // Navigate to Repayment Planner
+                    Intent intent = new Intent(MainActivity.this, RepaymentMenu.class);
+                    startActivity(intent);
                     return true;
                 } else if (id == R.id.navigation_budget) {
                     // Navigate to Budget & Expense Management
