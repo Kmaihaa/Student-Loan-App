@@ -65,16 +65,16 @@ public class ProfileActivity extends AppCompatActivity {
                     startActivity(new Intent(ProfileActivity.this, MainActivity.class));
                     return true;
                 } else if (id == R.id.navigation_repayment_planner) {
-                    // TODO: Navigate to Repayment Planner
+                    startActivity(new Intent(ProfileActivity.this, RepaymentMenu.class));
                     return true;
                 } else if (id == R.id.navigation_budget) {
-                    // TODO: Navigate to Budget & Expense Management
+                    startActivity(new Intent(ProfileActivity.this, BudgetExpenseActivity.class));
                     return true;
                 } else if (id == R.id.navigation_notifications) {
-                    // TODO: Navigate to Notifications
+                    startActivity(new Intent(ProfileActivity.this, NotificationsActivity.class));
                     return true;
                 } else if (id == R.id.navigation_profile) {
-                    // Already on Profile page
+                    startActivity(new Intent(ProfileActivity.this, ProfileActivity.class));
                     return true;
                 }
                 return false;

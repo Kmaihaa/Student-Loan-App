@@ -5,17 +5,20 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -31,8 +34,13 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
+
 import androidx.annotation.Nullable;
 
 public class BudgetExpenseActivity extends AppCompatActivity {
@@ -43,6 +51,7 @@ public class BudgetExpenseActivity extends AppCompatActivity {
     private TextView textViewMonthlyIncome, textViewLoanRepaymentSuggestion, textViewExpenseSuggestion;
     private PieChart pieChartBudget;
     private EditText editTextExpenseName, editTextExpenseAmount;
+    private EditText editTextChargeDate;  // For picking a date
     private RecyclerView recyclerViewExpenses;
 
     // Firebase
@@ -55,6 +64,9 @@ public class BudgetExpenseActivity extends AppCompatActivity {
 
     // User profile
     private Profile userProfile;
+
+    // Will store the selected date (in millis) when user picks from DatePicker
+    private long selectedChargeDate = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +84,10 @@ public class BudgetExpenseActivity extends AppCompatActivity {
         pieChartBudget = findViewById(R.id.pieChartBudget);
         editTextExpenseName = findViewById(R.id.editTextExpenseName);
         editTextExpenseAmount = findViewById(R.id.editTextExpenseAmount);
+        editTextChargeDate = findViewById(R.id.editTextChargeDate);
         recyclerViewExpenses = findViewById(R.id.recyclerViewExpenses);
 
-        // Setup RecyclerView
+        // Set up RecyclerView
         recyclerViewExpenses.setLayoutManager(new LinearLayoutManager(this));
         expenseAdapter = new ExpenseAdapter(expenseItemList, new ExpenseAdapter.OnExpenseItemClickListener() {
             @Override
@@ -89,9 +102,9 @@ public class BudgetExpenseActivity extends AppCompatActivity {
         });
         recyclerViewExpenses.setAdapter(expenseAdapter);
 
-        // Setup Bottom Navigation
+        // Set up Bottom Navigation
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener(){
+        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
@@ -99,13 +112,13 @@ public class BudgetExpenseActivity extends AppCompatActivity {
                     startActivity(new Intent(BudgetExpenseActivity.this, MainActivity.class));
                     return true;
                 } else if (id == R.id.navigation_repayment_planner) {
-                    // TODO: Start Repayment Planner Activity
+                    startActivity(new Intent(BudgetExpenseActivity.this, RepaymentMenu.class));
                     return true;
                 } else if (id == R.id.navigation_budget) {
-                    // Already here
+                    // We are already here
                     return true;
                 } else if (id == R.id.navigation_notifications) {
-                    // TODO: Start Notifications Activity
+                    startActivity(new Intent(BudgetExpenseActivity.this, NotificationsActivity.class));
                     return true;
                 } else if (id == R.id.navigation_profile) {
                     startActivity(new Intent(BudgetExpenseActivity.this, ProfileActivity.class));
@@ -124,8 +137,35 @@ public class BudgetExpenseActivity extends AppCompatActivity {
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
         }
 
+        // Handle date picking when user clicks on editTextChargeDate
+        editTextChargeDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Calendar calendar = Calendar.getInstance();
+                int year = calendar.get(Calendar.YEAR);
+                int month = calendar.get(Calendar.MONTH);
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+                DatePickerDialog datePickerDialog = new DatePickerDialog(
+                        BudgetExpenseActivity.this,
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker datePicker, int year1, int monthOfYear, int dayOfMonth) {
+                                calendar.set(year1, monthOfYear, dayOfMonth);
+                                selectedChargeDate = calendar.getTimeInMillis();
+                                editTextChargeDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year1);
+                            }
+                        },
+                        year,
+                        month,
+                        day
+                );
+                datePickerDialog.show();
+            }
+        });
+
         // Set listener for adding a new expense
-        findViewById(R.id.buttonAddExpense).setOnClickListener(new View.OnClickListener(){
+        findViewById(R.id.buttonAddExpense).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FirebaseUser user = auth.getCurrentUser();
@@ -155,10 +195,10 @@ public class BudgetExpenseActivity extends AppCompatActivity {
         });
     }
 
-    // Listen to expenses collection in real-time
+    // Listen to expenses collection in real-time (order by "chargeDate" now)
     private void listenToExpenses(String uid) {
         CollectionReference expensesRef = db.collection("profile").document(uid).collection("expenses");
-        expensesRef.orderBy("timestamp").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        expensesRef.orderBy("chargeDate").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot snapshots,
                                 @Nullable FirebaseFirestoreException e) {
@@ -183,6 +223,9 @@ public class BudgetExpenseActivity extends AppCompatActivity {
 
     // Update the UI (TextViews and PieChart) using profile data and expense totals
     private void updateBudgetUI() {
+
+        FirebaseUser currentUser = auth.getCurrentUser();
+
         if (userProfile == null) return;
 
         double monthlyIncome = userProfile.getMonthlyIncome();
@@ -190,11 +233,16 @@ public class BudgetExpenseActivity extends AppCompatActivity {
 
         // Calculate loan repayment suggestion (real-world logic)
         double loanRepaymentSuggestion = (interestRate > 5.0) ? monthlyIncome * 0.15 : monthlyIncome * 0.10;
+
+// Update the profile document with the recommended repayment (if you want to store it)
+        db.collection("profile").document(currentUser.getUid())
+                .update("recommendedRepayment", loanRepaymentSuggestion);
         // Sum actual expenses from the expense list
         double totalExpenses = 0.0;
         for (ExpenseItem item : expenseItemList) {
             totalExpenses += item.getExpense().getAmount();
         }
+
         // Calculate remaining savings
         double savings = monthlyIncome - (loanRepaymentSuggestion + totalExpenses);
 
@@ -203,6 +251,12 @@ public class BudgetExpenseActivity extends AppCompatActivity {
         textViewLoanRepaymentSuggestion.setText("Recommended Loan Payment: $" + String.format("%.2f", loanRepaymentSuggestion));
         textViewExpenseSuggestion.setText("Total Expenses: $" + String.format("%.2f", totalExpenses) +
                 "\nRemaining Savings: $" + String.format("%.2f", savings));
+
+        // Save the computed recommended repayment in SharedPreferences
+        getSharedPreferences("loanRepayment", MODE_PRIVATE)
+                .edit()
+                .putFloat("recommendedRepayment", (float) loanRepaymentSuggestion)
+                .apply();
 
         // Update PieChart entries
         List<PieEntry> entries = new ArrayList<>();
@@ -223,25 +277,30 @@ public class BudgetExpenseActivity extends AppCompatActivity {
         pieChartBudget.invalidate(); // refresh chart
     }
 
-    // Add an expense (creates a new expense document)
+    // Modified addExpense method that uses selectedChargeDate
     private void addExpense(String uid) {
         String expenseName = editTextExpenseName.getText().toString().trim();
         String expenseAmountStr = editTextExpenseAmount.getText().toString().trim();
 
-        if (expenseName.isEmpty() || expenseAmountStr.isEmpty()) {
-            Toast.makeText(this, "Please fill in all expense fields", Toast.LENGTH_SHORT).show();
+        if (expenseName.isEmpty() || expenseAmountStr.isEmpty() || selectedChargeDate == 0) {
+            Toast.makeText(this, "Please fill in all expense fields including charge date", Toast.LENGTH_SHORT).show();
             return;
         }
 
         double expenseAmount = Double.parseDouble(expenseAmountStr);
-        Expense expense = new Expense(expenseName, expenseAmount, System.currentTimeMillis());
+        Expense expense = new Expense(expenseName, expenseAmount, selectedChargeDate);
 
         db.collection("profile").document(uid)
                 .collection("expenses")
                 .add(expense)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(BudgetExpenseActivity.this, "Expense added", Toast.LENGTH_SHORT).show();
-                    // The snapshot listener will update the list and chart
+                    // Schedule expense notification using AlarmManager
+                    NotificationScheduler.scheduleExpenseNotification(
+                            BudgetExpenseActivity.this,
+                            expense,
+                            documentReference.getId()
+                    );
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(BudgetExpenseActivity.this, "Error adding expense: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -275,43 +334,97 @@ public class BudgetExpenseActivity extends AppCompatActivity {
                 });
     }
 
-    // Show an edit dialog to update the expense details
+    // Show an edit dialog to update the expense details, including charge date
     private void showEditExpenseDialog(ExpenseItem expenseItem) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit Expense");
 
-        // Create input fields for expense name and amount
+        // Inflate a custom layout that includes fields for name, amount, and charge date
         View viewInflated = getLayoutInflater().inflate(R.layout.dialog_edit_expense, null);
         final EditText inputName = viewInflated.findViewById(R.id.editTextDialogExpenseName);
         final EditText inputAmount = viewInflated.findViewById(R.id.editTextDialogExpenseAmount);
+        final EditText inputChargeDate = viewInflated.findViewById(R.id.editTextDialogChargeDate);
 
         // Pre-fill with current values
         inputName.setText(expenseItem.getExpense().getName());
         inputAmount.setText(String.valueOf(expenseItem.getExpense().getAmount()));
+
+        // Format the existing charge date
+        long currentChargeDate = expenseItem.getExpense().getChargeDate();
+        if (currentChargeDate != 0) {
+            SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy", Locale.getDefault());
+            inputChargeDate.setText(sdf.format(currentChargeDate));
+        }
+
+        // Set up a date picker for the charge date field in the dialog
+        inputChargeDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Calendar calendar = Calendar.getInstance();
+                int year, month, day;
+                SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy", Locale.getDefault());
+                if (!inputChargeDate.getText().toString().isEmpty()) {
+                    // Try to parse the existing date in the field
+                    try {
+                        calendar.setTime(sdf.parse(inputChargeDate.getText().toString()));
+                    } catch (Exception e) {
+                        // ignore and use current date
+                    }
+                }
+                year = calendar.get(Calendar.YEAR);
+                month = calendar.get(Calendar.MONTH);
+                day = calendar.get(Calendar.DAY_OF_MONTH);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(
+                        BudgetExpenseActivity.this,
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker datePicker, int year1, int monthOfYear, int dayOfMonth) {
+                                calendar.set(year1, monthOfYear, dayOfMonth);
+                                inputChargeDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year1);
+                            }
+                        },
+                        year,
+                        month,
+                        day
+                );
+                datePickerDialog.show();
+            }
+        });
 
         builder.setView(viewInflated);
 
         builder.setPositiveButton("Update", (dialog, which) -> {
             String newName = inputName.getText().toString().trim();
             String newAmountStr = inputAmount.getText().toString().trim();
-            if (newName.isEmpty() || newAmountStr.isEmpty()) {
+            String newChargeDateStr = inputChargeDate.getText().toString().trim();
+
+            if (newName.isEmpty() || newAmountStr.isEmpty() || newChargeDateStr.isEmpty()) {
                 Toast.makeText(BudgetExpenseActivity.this, "Fields cannot be empty", Toast.LENGTH_SHORT).show();
                 return;
             }
             double newAmount = Double.parseDouble(newAmountStr);
-            updateExpense(expenseItem, newName, newAmount);
+            // Parse new charge date string into timestamp
+            long newChargeDate = 0;
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy", Locale.getDefault());
+                newChargeDate = sdf.parse(newChargeDateStr).getTime();
+            } catch (Exception e) {
+                Toast.makeText(BudgetExpenseActivity.this, "Invalid date format", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            updateExpense(expenseItem, newName, newAmount, newChargeDate);
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
         builder.show();
     }
 
-    // Update an expense document with new values
-    private void updateExpense(ExpenseItem expenseItem, String newName, double newAmount) {
+    // Update an expense document with new values, including charge date
+    private void updateExpense(ExpenseItem expenseItem, String newName, double newAmount, long newChargeDate) {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) return;
         DocumentReference expenseDoc = db.collection("profile").document(user.getUid())
                 .collection("expenses").document(expenseItem.getDocId());
-        expenseDoc.update("name", newName, "amount", newAmount)
+        expenseDoc.update("name", newName, "amount", newAmount, "chargeDate", newChargeDate)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(BudgetExpenseActivity.this, "Expense updated", Toast.LENGTH_SHORT).show();
                 })

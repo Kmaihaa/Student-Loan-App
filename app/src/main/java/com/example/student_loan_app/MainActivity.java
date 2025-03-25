@@ -26,8 +26,6 @@ public class MainActivity extends AppCompatActivity {
     private Button btnFinancialLiteracy;
     private Button interactiveToolsButton;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -62,30 +60,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
-
                 if (id == R.id.navigation_home) {
-                    // Navigate to Home
+                    startActivity(new Intent(MainActivity.this, MainActivity.class));
                     return true;
                 } else if (id == R.id.navigation_repayment_planner) {
-                    Intent intent = new Intent(MainActivity.this, RepaymentMenu.class);
-                    startActivity(intent);
+                    startActivity(new Intent(MainActivity.this, RepaymentMenu.class));
                     return true;
                 } else if (id == R.id.navigation_budget) {
-                    // Navigate to Budget & Expense Management
-                    Intent intent = new Intent(MainActivity.this, BudgetExpenseActivity.class);
-                    startActivity(intent);
+                    startActivity(new Intent(MainActivity.this, BudgetExpenseActivity.class));
                     return true;
-                }   else if (id == R.id.navigation_notifications) {
-                    // Navigate to Notifications
+                } else if (id == R.id.navigation_notifications) {
+                    startActivity(new Intent(MainActivity.this, NotificationsActivity.class));
                     return true;
                 } else if (id == R.id.navigation_profile) {
-                    // Navigate to Profile
-                    Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                    startActivity(intent);
+                    startActivity(new Intent(MainActivity.this, ProfileActivity.class));
                     return true;
-                } else {
-                    return false;
                 }
+                return false;
             }
         });
 
