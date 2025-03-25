@@ -18,5 +18,6 @@ public class RepaymentMenu extends AppCompatActivity {
         btnSimulation.setOnClickListener(v -> startActivity(new Intent(RepaymentMenu.this, RepaymentSimulationActivity.class)));
         btnExtraPayment.setOnClickListener(v -> startActivity(new Intent(RepaymentMenu.this, ExtraPaymentActivity.class)));
         btnGoalSetting.setOnClickListener(v -> startActivity(new Intent(RepaymentMenu.this, GoalSettingActivity.class)));
+
     }
 }
