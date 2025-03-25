@@ -118,7 +118,7 @@ public class BudgetExpenseActivity extends AppCompatActivity {
                     // We are already here
                     return true;
                 } else if (id == R.id.navigation_notifications) {
-                    // TODO: Navigate to Notifications
+                    startActivity(new Intent(BudgetExpenseActivity.this, NotificationsActivity.class));
                     return true;
                 } else if (id == R.id.navigation_profile) {
                     startActivity(new Intent(BudgetExpenseActivity.this, ProfileActivity.class));
