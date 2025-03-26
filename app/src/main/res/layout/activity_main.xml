@@ -51,18 +51,6 @@
             android:background="?attr/selectableItemBackground"/>
     </FrameLayout>
 
-    <!-- Financial Literacy Button -->
-    <Button
-        android:id="@+id/btnFinancialLiteracy"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Financial Literacy Resources"
-        app:layout_constraintTop_toBottomOf="@id/frameLayoutPieChart"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"/>
-
     <!-- Line Chart for Loan Repayment Graph -->
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/lineChart"
