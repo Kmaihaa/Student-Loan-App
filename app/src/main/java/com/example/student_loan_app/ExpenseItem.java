@@ -4,6 +4,16 @@ public class ExpenseItem {
     private Expense expense;
     private String docId;  // Firestore document id
 
+    private boolean dismissed = false;
+
+    public boolean isDismissed() {
+        return dismissed;
+    }
+
+    public void setDismissed(boolean dismissed) {
+        this.dismissed = dismissed;
+    }
+
     public ExpenseItem() { }
 
     public ExpenseItem(Expense expense, String docId) {
