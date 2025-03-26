@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
+        android:text="Loan Repayment Planner"
+        android:textColor="@color/lavender"
+        android:gravity="center"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/btnSimulation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Repayment Simulation"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/lavender"/>
+
+    <Button
+        android:id="@+id/btnExtraPayment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Extra Payments Simulation"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/lavender"/>
+
+    <Button
+        android:id="@+id/btnGoalSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Goal Setting"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/lavender"/>
+
+</LinearLayout>

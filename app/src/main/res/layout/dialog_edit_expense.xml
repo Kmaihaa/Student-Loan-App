@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Existing fields -->
+    <EditText
+        android:id="@+id/editTextDialogExpenseName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Expense Name" />
+
+    <EditText
+        android:id="@+id/editTextDialogExpenseAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Expense Amount" />
+
+    <!-- NEW: Field for editing the charge date -->
+    <EditText
+        android:id="@+id/editTextDialogChargeDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Charge Date"
+        android:focusable="false" />
+</LinearLayout>
