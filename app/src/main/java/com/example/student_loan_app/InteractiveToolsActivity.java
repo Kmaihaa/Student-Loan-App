@@ -30,7 +30,7 @@ public class InteractiveToolsActivity extends AppCompatActivity {
         });
 
         btnRepaymentEstimator.setOnClickListener(v -> {
-            Intent intent = new Intent(InteractiveToolsActivity.this, RepaymentEstimatorActivity.class);
+            Intent intent = new Intent(InteractiveToolsActivity.this, DebtToIncomeCalculatorActivity.class);
             startActivity(intent);
         });
 

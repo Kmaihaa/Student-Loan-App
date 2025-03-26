@@ -1,30 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:background="#f5f5f5">
 
-    <Button
-        android:id="@+id/btnBackToMenu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Back to Menu" />
-
-    <Button
-        android:id="@+id/btnLoanCalculator"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
 
-        android:text="Loan Calculator" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Interactive Tools"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#333"
+            android:layout_marginBottom="24dp" />
 
-    <Button
-        android:id="@+id/btnRepaymentEstimator"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Repayment Estimator" />
+        <Button
+            android:id="@+id/btnLoanCalculator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="💰 Loan Calculator"
+            android:textAllCaps="false"
+            android:backgroundTint="#4CAF50"
+            android:textColor="#fff"
+            android:layout_marginBottom="16dp" />
 
+        <Button
+            android:id="@+id/btnRepaymentEstimator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📊 Debt-to-Income Calculator"
+            android:textAllCaps="false"
+            android:backgroundTint="#FFC107"
+            android:textColor="#000"
+            android:layout_marginBottom="16dp" />
 
-
-</LinearLayout>
+        <Button
+            android:id="@+id/btnBackToMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="← Back to Menu"
+            android:textAllCaps="false"
+            android:backgroundTint="#607D8B"
+            android:textColor="#fff"
+            android:layout_marginTop="24dp" />
+    </LinearLayout>
+</ScrollView>
