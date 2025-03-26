@@ -37,7 +37,6 @@ public class RepaymentMenu extends AppCompatActivity {
                 int id = item.getItemId();
 
                 if (id == R.id.navigation_home) {
-                    // Navigate to Home
                     Intent intent = new Intent(RepaymentMenu.this, MainActivity.class);
                     startActivity(intent);
                     return true;
@@ -46,15 +45,13 @@ public class RepaymentMenu extends AppCompatActivity {
                     startActivity(intent);
                     return true;
                 } else if (id == R.id.navigation_budget) {
-                    // Navigate to Budget & Expense Management
                     Intent intent = new Intent(RepaymentMenu.this, BudgetExpenseActivity.class);
                     startActivity(intent);
                     return true;
                 }   else if (id == R.id.navigation_notifications) {
-                    // Navigate to Notifications
+                    Intent intent = new Intent(RepaymentMenu.this, NotificationsActivity.class);
                     return true;
                 } else if (id == R.id.navigation_profile) {
-                    // Navigate to Profile
                     Intent intent = new Intent(RepaymentMenu.this, ProfileActivity.class);
                     startActivity(intent);
                     return true;

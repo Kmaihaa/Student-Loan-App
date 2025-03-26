@@ -6,6 +6,7 @@
     android:id="@+id/mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/lavender"
     tools:context=".MainActivity">
 
     <!-- Welcome Text -->
@@ -14,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Welcome User"
+        android:text="Welcome"
         android:textSize="48sp"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
@@ -43,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="$10,000"
+            android:text="Data loading..."
             android:textSize="24sp"
             android:textStyle="bold"
             android:clickable="true"
@@ -61,7 +62,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Bottom Navigation -->
 
     <Button
         android:id="@+id/btnFinancialLiteracy"
