@@ -22,17 +22,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    // Fields
     private EditText editTextName, editTextAge, editTextLoanAmount, editTextMonthlyIncome;
     private EditText editTextInterestRate, editTextLoanTerm;
     private Spinner spinnerCompoundFrequency, spinnerRepaymentPlan;
     private Button buttonSubmit;
 
-    // Firebase
     private FirebaseFirestore db;
     private FirebaseAuth auth;
 
-    // Constants
     private static final String TAG = "ProfileActivity";
 
     @Override
@@ -40,11 +37,9 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        // Initialize Firebase
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        // Bind Views
         editTextName = findViewById(R.id.editTextName);
         editTextAge = findViewById(R.id.editTextAge);
         editTextLoanAmount = findViewById(R.id.editTextLoanAmount);
@@ -65,32 +60,29 @@ public class ProfileActivity extends AppCompatActivity {
                     startActivity(new Intent(ProfileActivity.this, MainActivity.class));
                     return true;
                 } else if (id == R.id.navigation_repayment_planner) {
-                    // TODO: Navigate to Repayment Planner
+                    startActivity(new Intent(ProfileActivity.this, RepaymentMenu.class));
                     return true;
                 } else if (id == R.id.navigation_budget) {
-                    // TODO: Navigate to Budget & Expense Management
+                    startActivity(new Intent(ProfileActivity.this, BudgetExpenseActivity.class));
                     return true;
                 } else if (id == R.id.navigation_notifications) {
-                    // TODO: Navigate to Notifications
+                    startActivity(new Intent(ProfileActivity.this, NotificationsActivity.class));
                     return true;
                 } else if (id == R.id.navigation_profile) {
-                    // Already on Profile page
+                    startActivity(new Intent(ProfileActivity.this, ProfileActivity.class));
                     return true;
                 }
                 return false;
             }
         });
 
-        // If a user is logged in, load their profile data
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser != null) {
             loadProfileData(currentUser.getUid());
         } else {
-            // If no user is logged in, you might prompt them to log in
             Toast.makeText(this, "No user logged in.", Toast.LENGTH_SHORT).show();
         }
 
-        // Submit button
         buttonSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -104,27 +96,18 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
-    // Load existing profile data if it exists
     private void loadProfileData(String userId) {
         DocumentReference docRef = db.collection("profile").document(userId);
         docRef.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
-                // Convert document to Profile object
                 Profile profile = documentSnapshot.toObject(Profile.class);
                 if (profile != null) {
-                    // Populate the fields
                     editTextName.setText(profile.getName());
                     editTextAge.setText(String.valueOf(profile.getAge()));
                     editTextLoanAmount.setText(String.valueOf(profile.getLoanAmount()));
                     editTextMonthlyIncome.setText(String.valueOf(profile.getMonthlyIncome()));
                     editTextInterestRate.setText(String.valueOf(profile.getInterestRate()));
                     editTextLoanTerm.setText(String.valueOf(profile.getLoanTerm()));
-
-                    // Set the spinner selections
-                    // For compoundFrequency and repaymentPlan, you'll need to match the array index
-                    // if (profile.getCompoundFrequency() != null) { ... }
-                    // if (profile.getRepaymentPlan() != null) { ... }
-                    // For simplicity, we won't show the full spinner selection code here
                 }
             } else {
                 Log.d(TAG, "No profile document found for user: " + userId);
@@ -134,35 +117,28 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
-    // Create or update the user's profile
     private void submitProfile(String userId) {
-        // Retrieve text inputs
         String name = editTextName.getText().toString().trim();
         String ageStr = editTextAge.getText().toString().trim();
         String loanAmountStr = editTextLoanAmount.getText().toString().trim();
         String monthlyIncomeStr = editTextMonthlyIncome.getText().toString().trim();
         String interestRateStr = editTextInterestRate.getText().toString().trim();
         String loanTermStr = editTextLoanTerm.getText().toString().trim();
-
-        // Retrieve spinner selections
         String compoundFrequency = spinnerCompoundFrequency.getSelectedItem().toString();
         String repaymentPlan = spinnerRepaymentPlan.getSelectedItem().toString();
 
-        // Validate fields
         if (name.isEmpty() || ageStr.isEmpty() || loanAmountStr.isEmpty() ||
                 monthlyIncomeStr.isEmpty() || interestRateStr.isEmpty() || loanTermStr.isEmpty()) {
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Parse numeric values
         int age = Integer.parseInt(ageStr);
         double loanAmount = Double.parseDouble(loanAmountStr);
         double monthlyIncome = Double.parseDouble(monthlyIncomeStr);
         double interestRate = Double.parseDouble(interestRateStr);
         double loanTerm = Double.parseDouble(loanTermStr);
 
-        // Build Profile object
         Profile profile = new Profile(
                 name,
                 age,
@@ -174,7 +150,6 @@ public class ProfileActivity extends AppCompatActivity {
                 repaymentPlan
         );
 
-        // Use set() with the userId as the document ID
         DocumentReference docRef = db.collection("profile").document(userId);
         docRef.set(profile)
                 .addOnSuccessListener(aVoid -> {
