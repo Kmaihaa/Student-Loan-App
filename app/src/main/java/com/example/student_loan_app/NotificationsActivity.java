@@ -78,19 +78,16 @@ public class NotificationsActivity extends AppCompatActivity {
         DocumentReference profileRef = db.collection("profile").document(currentUser.getUid());
         profileRef.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
-                // Assuming your Profile class has getters for monthlyIncome and interestRate.
                 Profile profile = documentSnapshot.toObject(Profile.class);
                 if (profile != null) {
                     double monthlyIncome = profile.getMonthlyIncome();
                     double interestRate = profile.getInterestRate();
 
-                    // Get stored loan payment stats or use defaults.
                     int paymentsMade = documentSnapshot.contains("paymentsMade")
                             ? documentSnapshot.getLong("paymentsMade").intValue() : 0;
                     double totalRepaid = documentSnapshot.contains("totalRepaid")
                             ? documentSnapshot.getDouble("totalRepaid") : 0.0;
 
-                    // Compute recommended repayment using your formula.
                     double recommendedRepayment = (interestRate > 5.0)
                             ? monthlyIncome * 0.15
                             : monthlyIncome * 0.10;
@@ -105,7 +102,6 @@ public class NotificationsActivity extends AppCompatActivity {
                 Toast.makeText(NotificationsActivity.this, "Failed to load loan stats", Toast.LENGTH_SHORT).show());
     }
 
-    // Listen to upcoming expenses using a snapshot listener so changes update automatically.
     private void listenToUpcomingExpenses() {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) {
@@ -204,7 +200,6 @@ public class NotificationsActivity extends AppCompatActivity {
                         "totalRepaid", FieldValue.increment((double) paymentAmount))
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(NotificationsActivity.this, "Payment recorded", Toast.LENGTH_SHORT).show();
-                    // Refresh loan stats from Firestore.
                     loadLoanStats();
                 })
                 .addOnFailureListener(e ->

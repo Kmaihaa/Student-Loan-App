@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // 1. Find Views
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         pieChart = findViewById(R.id.pieChart);
         lineChart = findViewById(R.id.lineChart);
@@ -55,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         textViewWelcome = findViewById(R.id.textViewWelcome);
         btnFinancialLiteracy = findViewById(R.id.btnFinancialLiteracy);
 
-        // 2. Fetch user profile data from Firestore (including loan details)
+        // Fetch user profile data from Firestore
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("profile")
                 .limit(1)
@@ -64,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
                     if (!querySnapshot.isEmpty()) {
                         DocumentSnapshot doc = querySnapshot.getDocuments().get(0);
 
-                        // Update welcome message
                         String firstName = doc.getString("name");
                         textViewWelcome.setText((firstName != null && !firstName.isEmpty())
                                 ? "Welcome, " + firstName
@@ -76,13 +74,9 @@ public class MainActivity extends AppCompatActivity {
                         if (fullLoanAmount != null && totalRepaid != null) {
                             fetchedFullLoanAmount = fullLoanAmount;
                             fetchedTotalRepaid = totalRepaid;
-                            // Calculate remaining amount
                             double remainingAmount = fetchedFullLoanAmount - fetchedTotalRepaid;
-                            // Update central text in the pie chart
                             textViewRemainingLoan.setText("$" + String.format("%.2f", remainingAmount));
-                            // Update the pie chart with two segments: repaid and remaining
                             updateLoanPieChartData((float) fetchedTotalRepaid, (float) remainingAmount);
-                            // Load detailed repayment schedule into the line chart
                             loadDetailedLineChartData();
                         }
                     } else {
@@ -91,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> Log.e("FirestoreTest", "Connection failed", e));
 
-        // 3. Bottom Navigation Listener
+        // Bottom Navigation Listener
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -114,13 +108,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // 4. Configure the PieChart
         setupPieChart();
-
-        // 5. Configure the LineChart for detailed repayment schedule
         setupLineChart();
 
-        // 6. Toggle Remaining Loan Visibility on click
+        // Toggle Remaining Loan Visibility on click
         textViewRemainingLoan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // 7. Financial Literacy Button click listener
         btnFinancialLiteracy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -149,9 +139,6 @@ public class MainActivity extends AppCompatActivity {
         pieChart.getLegend().setEnabled(false);
     }
 
-    /**
-     * Updates the pie chart with segments for total repaid and remaining.
-     */
     private void updateLoanPieChartData(float totalRepaid, float remaining) {
         List<PieEntry> entries = new ArrayList<>();
         entries.add(new PieEntry(totalRepaid, "Repaid"));
@@ -170,9 +157,6 @@ public class MainActivity extends AppCompatActivity {
         pieChart.invalidate();
     }
 
-    /**
-     * Configures the line chart for detailed repayment schedule.
-     */
     private void setupLineChart() {
         lineChart.getDescription().setEnabled(false);
         lineChart.getLegend().setEnabled(true);
@@ -187,21 +171,13 @@ public class MainActivity extends AppCompatActivity {
         lineChart.setMarker(markerView);
     }
 
-    /**
-     * Loads sample detailed repayment schedule data into the line chart.
-     * In a real scenario, calculate the projected repayment schedule including interest.
-     */
     private void loadDetailedLineChartData() {
-        // For demonstration, generate sample data over a 12-month period.
-        // We’ll assume a simple linear growth for the projected repayment line.
         int months = 12;
         float monthlyIncrement = (float) ((fetchedFullLoanAmount - fetchedTotalRepaid) / months);
         float cumulativeRepaid = (float) fetchedTotalRepaid;
 
-        // 1. Build the projected repayment schedule data points
         List<Entry> scheduleEntries = new ArrayList<>();
         for (int i = 0; i <= months; i++) {
-            // Simulate cumulative repayment including interest (sample values)
             scheduleEntries.add(new Entry(i, cumulativeRepaid));
             cumulativeRepaid += monthlyIncrement; // Increase monthly
         }
@@ -213,27 +189,20 @@ public class MainActivity extends AppCompatActivity {
         scheduleDataSet.setCircleRadius(4f);
         scheduleDataSet.setDrawValues(false);
 
-        // 2. Add a single data point to show the user's actual total repaid
-        //    We'll place it at x=0 to indicate "current" or you could choose a
-        //    relevant time index (e.g., x=some month).
         List<Entry> repaidEntries = new ArrayList<>();
-        // Place the point at x=0 (start) or any index that makes sense for your data
         repaidEntries.add(new Entry(0, (float) fetchedTotalRepaid));
 
         LineDataSet repaidDataSet = new LineDataSet(repaidEntries, "User's Total Repaid");
         repaidDataSet.setColor(Color.RED);
         repaidDataSet.setCircleColor(Color.RED);
         repaidDataSet.setCircleRadius(6f);
-        repaidDataSet.setDrawValues(true); // show the value label on this single point
-        // If you don't want a line connecting multiple points, set the line width to 0
+        repaidDataSet.setDrawValues(true);
         repaidDataSet.setLineWidth(0f);
 
-        // 3. Combine both data sets into a single LineData object
         LineData lineData = new LineData(scheduleDataSet, repaidDataSet);
 
-        // 4. Set the combined data on the chart
         lineChart.setData(lineData);
-        lineChart.invalidate(); // Refresh the chart
+        lineChart.invalidate();
     }
 
 

@@ -34,7 +34,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         holder.textViewName.setText(expense.getName());
         holder.textViewAmount.setText("$" + String.format("%.2f", expense.getAmount()));
 
-        // Format the date
         long chargeDate = expense.getChargeDate();
         if (chargeDate > 0) {
             holder.textViewDueDate.setText("Due: " + sdf.format(chargeDate));

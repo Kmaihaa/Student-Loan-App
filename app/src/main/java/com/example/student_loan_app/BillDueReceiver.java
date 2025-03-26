@@ -9,14 +9,14 @@ public class BillDueReceiver extends BroadcastReceiver {
         double expenseAmount = intent.getDoubleExtra("expenseAmount", 0);
         String channelId = "expense_channel";
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(R.drawable.ic_notifications)  // use your notification icon
+                .setSmallIcon(R.drawable.ic_notifications)
                 .setContentTitle("Bill Due: " + expenseName)
                 .setContentText("Amount: $" + String.format("%.2f", expenseAmount))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-        // Use a unique id for this notification
+
         notificationManager.notify(expenseName.hashCode(), builder.build());
     }
 }

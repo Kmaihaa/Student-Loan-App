@@ -13,7 +13,6 @@ public class LoanRepaymentReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         double repaymentAmount = intent.getDoubleExtra("repaymentAmount", 0);
         String channelId = "loan_channel";
-        // Update loan repayment counters (this example uses SharedPreferences)
         SharedPreferences prefs = context.getSharedPreferences("loanRepayments", Context.MODE_PRIVATE);
         int paymentsMade = prefs.getInt("paymentsMade", 0) + 1;
         double totalRepaid = prefs.getFloat("totalRepaid", 0) + (float) repaymentAmount;
@@ -27,7 +26,6 @@ public class LoanRepaymentReceiver extends BroadcastReceiver {
                 .setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-        // Fixed id for loan repayment notifications
         notificationManager.notify(1000, builder.build());
     }
 }

@@ -51,7 +51,7 @@ public class BudgetExpenseActivity extends AppCompatActivity {
     private TextView textViewMonthlyIncome, textViewLoanRepaymentSuggestion, textViewExpenseSuggestion;
     private PieChart pieChartBudget;
     private EditText editTextExpenseName, editTextExpenseAmount;
-    private EditText editTextChargeDate;  // For picking a date
+    private EditText editTextChargeDate;
     private RecyclerView recyclerViewExpenses;
 
     // Firebase
@@ -62,10 +62,8 @@ public class BudgetExpenseActivity extends AppCompatActivity {
     private ExpenseAdapter expenseAdapter;
     private List<ExpenseItem> expenseItemList = new ArrayList<>();
 
-    // User profile
     private Profile userProfile;
 
-    // Will store the selected date (in millis) when user picks from DatePicker
     private long selectedChargeDate = 0;
 
     @Override
@@ -137,7 +135,6 @@ public class BudgetExpenseActivity extends AppCompatActivity {
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
         }
 
-        // Handle date picking when user clicks on editTextChargeDate
         editTextChargeDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -164,7 +161,6 @@ public class BudgetExpenseActivity extends AppCompatActivity {
             }
         });
 
-        // Set listener for adding a new expense
         findViewById(R.id.buttonAddExpense).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -195,7 +191,6 @@ public class BudgetExpenseActivity extends AppCompatActivity {
         });
     }
 
-    // Listen to expenses collection in real-time (order by "chargeDate" now)
     private void listenToExpenses(String uid) {
         CollectionReference expensesRef = db.collection("profile").document(uid).collection("expenses");
         expensesRef.orderBy("chargeDate").addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -214,14 +209,13 @@ public class BudgetExpenseActivity extends AppCompatActivity {
                         expenseItemList.add(new ExpenseItem(expense, docId));
                     }
                     expenseAdapter.notifyDataSetChanged();
-                    // Update chart based on expense changes
                     updateBudgetUI();
                 }
             }
         });
     }
 
-    // Update the UI (TextViews and PieChart) using profile data and expense totals
+    // Update the UI using profile data and expense totals
     private void updateBudgetUI() {
 
         FirebaseUser currentUser = auth.getCurrentUser();
@@ -231,13 +225,11 @@ public class BudgetExpenseActivity extends AppCompatActivity {
         double monthlyIncome = userProfile.getMonthlyIncome();
         double interestRate = userProfile.getInterestRate();
 
-        // Calculate loan repayment suggestion (real-world logic)
+        // Calculate loan repayment suggestion
         double loanRepaymentSuggestion = (interestRate > 5.0) ? monthlyIncome * 0.15 : monthlyIncome * 0.10;
 
-// Update the profile document with the recommended repayment (if you want to store it)
         db.collection("profile").document(currentUser.getUid())
                 .update("recommendedRepayment", loanRepaymentSuggestion);
-        // Sum actual expenses from the expense list
         double totalExpenses = 0.0;
         for (ExpenseItem item : expenseItemList) {
             totalExpenses += item.getExpense().getAmount();
@@ -246,19 +238,16 @@ public class BudgetExpenseActivity extends AppCompatActivity {
         // Calculate remaining savings
         double savings = monthlyIncome - (loanRepaymentSuggestion + totalExpenses);
 
-        // Update TextViews
         textViewMonthlyIncome.setText("Monthly Income: $" + String.format("%.2f", monthlyIncome));
         textViewLoanRepaymentSuggestion.setText("Recommended Loan Payment: $" + String.format("%.2f", loanRepaymentSuggestion));
         textViewExpenseSuggestion.setText("Total Expenses: $" + String.format("%.2f", totalExpenses) +
                 "\nRemaining Savings: $" + String.format("%.2f", savings));
 
-        // Save the computed recommended repayment in SharedPreferences
         getSharedPreferences("loanRepayment", MODE_PRIVATE)
                 .edit()
                 .putFloat("recommendedRepayment", (float) loanRepaymentSuggestion)
                 .apply();
 
-        // Update PieChart entries
         List<PieEntry> entries = new ArrayList<>();
         entries.add(new PieEntry((float) loanRepaymentSuggestion, "Loan Repayment"));
         entries.add(new PieEntry((float) totalExpenses, "Expenses"));
@@ -277,7 +266,6 @@ public class BudgetExpenseActivity extends AppCompatActivity {
         pieChartBudget.invalidate(); // refresh chart
     }
 
-    // Modified addExpense method that uses selectedChargeDate
     private void addExpense(String uid) {
         String expenseName = editTextExpenseName.getText().toString().trim();
         String expenseAmountStr = editTextExpenseAmount.getText().toString().trim();
@@ -307,7 +295,6 @@ public class BudgetExpenseActivity extends AppCompatActivity {
                 });
     }
 
-    // Show a confirmation dialog and delete the expense if confirmed
     private void showDeleteExpenseDialog(ExpenseItem expenseItem) {
         new AlertDialog.Builder(this)
                 .setTitle("Delete Expense")
@@ -334,29 +321,24 @@ public class BudgetExpenseActivity extends AppCompatActivity {
                 });
     }
 
-    // Show an edit dialog to update the expense details, including charge date
     private void showEditExpenseDialog(ExpenseItem expenseItem) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit Expense");
 
-        // Inflate a custom layout that includes fields for name, amount, and charge date
         View viewInflated = getLayoutInflater().inflate(R.layout.dialog_edit_expense, null);
         final EditText inputName = viewInflated.findViewById(R.id.editTextDialogExpenseName);
         final EditText inputAmount = viewInflated.findViewById(R.id.editTextDialogExpenseAmount);
         final EditText inputChargeDate = viewInflated.findViewById(R.id.editTextDialogChargeDate);
 
-        // Pre-fill with current values
         inputName.setText(expenseItem.getExpense().getName());
         inputAmount.setText(String.valueOf(expenseItem.getExpense().getAmount()));
 
-        // Format the existing charge date
         long currentChargeDate = expenseItem.getExpense().getChargeDate();
         if (currentChargeDate != 0) {
             SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy", Locale.getDefault());
             inputChargeDate.setText(sdf.format(currentChargeDate));
         }
 
-        // Set up a date picker for the charge date field in the dialog
         inputChargeDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -364,11 +346,10 @@ public class BudgetExpenseActivity extends AppCompatActivity {
                 int year, month, day;
                 SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy", Locale.getDefault());
                 if (!inputChargeDate.getText().toString().isEmpty()) {
-                    // Try to parse the existing date in the field
                     try {
                         calendar.setTime(sdf.parse(inputChargeDate.getText().toString()));
                     } catch (Exception e) {
-                        // ignore and use current date
+
                     }
                 }
                 year = calendar.get(Calendar.YEAR);
@@ -403,7 +384,6 @@ public class BudgetExpenseActivity extends AppCompatActivity {
                 return;
             }
             double newAmount = Double.parseDouble(newAmountStr);
-            // Parse new charge date string into timestamp
             long newChargeDate = 0;
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("d/M/yyyy", Locale.getDefault());
@@ -418,7 +398,6 @@ public class BudgetExpenseActivity extends AppCompatActivity {
         builder.show();
     }
 
-    // Update an expense document with new values, including charge date
     private void updateExpense(ExpenseItem expenseItem, String newName, double newAmount, long newChargeDate) {
         FirebaseUser user = auth.getCurrentUser();
         if (user == null) return;
