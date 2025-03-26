@@ -14,38 +14,28 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Loan Payment Calculator"
+            android:text="Debt-to-Income Ratio Calculator"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#333"
             android:layout_marginBottom="20dp" />
 
         <EditText
-            android:id="@+id/loanAmountInput"
+            android:id="@+id/incomeInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Loan Amount"
+            android:hint="Monthly Gross Income"
             android:inputType="numberDecimal"
             android:background="@android:drawable/edit_text"
             android:padding="10dp"
             android:layout_marginBottom="16dp" />
 
         <EditText
-            android:id="@+id/interestRateInput"
+            android:id="@+id/debtInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Interest Rate (%)"
+            android:hint="Total Monthly Debt Payments"
             android:inputType="numberDecimal"
-            android:background="@android:drawable/edit_text"
-            android:padding="10dp"
-            android:layout_marginBottom="16dp" />
-
-        <EditText
-            android:id="@+id/loanTermInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter Loan Term (Years)"
-            android:inputType="number"
             android:background="@android:drawable/edit_text"
             android:padding="10dp"
             android:layout_marginBottom="16dp" />
@@ -54,7 +44,7 @@
             android:id="@+id/calculateButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Calculate Payment"
+            android:text="Calculate DTI"
             android:textColor="#fff"
             android:layout_marginBottom="16dp" />
 
@@ -62,21 +52,26 @@
             android:id="@+id/resultText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Estimated Monthly Payment:"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#000"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="8dp" />
 
+        <TextView
+            android:id="@+id/adviceText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="#555" />
+
         <Button
             android:id="@+id/btnBackToMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Back to Menu"
+            android:layout_marginTop="24dp"
             android:backgroundTint="#607D8B"
-            android:textColor="#fff"
-            android:layout_marginTop="24dp" />
-
+            android:textColor="#fff" />
     </LinearLayout>
 </ScrollView>
