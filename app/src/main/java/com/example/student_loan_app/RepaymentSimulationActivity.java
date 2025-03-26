@@ -1,6 +1,8 @@
 package com.example.student_loan_app;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +18,8 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -33,6 +37,9 @@ public class RepaymentSimulationActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseFirestore db;
 
+    private BottomNavigationView bottomNavigationView;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +55,7 @@ public class RepaymentSimulationActivity extends AppCompatActivity {
         resultView = findViewById(R.id.tvResult);
         chart = findViewById(R.id.chart);
         Button btnCalculate = findViewById(R.id.btnCalculate);
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this,
@@ -60,6 +68,11 @@ public class RepaymentSimulationActivity extends AppCompatActivity {
         loadUserProfile();
 
         btnCalculate.setOnClickListener(v -> calculateRepayment());
+
+        Button btnBackToMenu = findViewById(R.id.btnBackToMenu);
+        btnBackToMenu.setOnClickListener(v -> {
+            finish();
+        });
     }
 
     private void loadUserProfile() {

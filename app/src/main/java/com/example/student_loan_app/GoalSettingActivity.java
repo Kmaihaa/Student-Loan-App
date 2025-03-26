@@ -21,6 +21,11 @@ public class GoalSettingActivity extends AppCompatActivity {
         Button btnCalculate = findViewById(R.id.btnCalculate);
 
         btnCalculate.setOnClickListener(v -> calculateGoalPayment());
+
+        Button btnBackToMenu = findViewById(R.id.btnBackToMenu);
+        btnBackToMenu.setOnClickListener(v -> {
+            finish();
+        });
     }
 
     private void calculateGoalPayment() {
