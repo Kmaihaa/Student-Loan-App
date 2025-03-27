@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Loan Amount"
+        android:background="@android:drawable/edit_text"
         android:inputType="numberDecimal"/>
 
     <EditText
@@ -18,6 +19,7 @@
         android:layout_height="wrap_content"
         android:hint="Interest Rate (%)"
         android:inputType="numberDecimal"
+        android:background="@android:drawable/edit_text"
         android:layout_marginTop="8dp"/>
 
     <EditText
@@ -26,6 +28,7 @@
         android:layout_height="wrap_content"
         android:hint="Loan Term (years)"
         android:inputType="number"
+        android:background="@android:drawable/edit_text"
         android:layout_marginTop="8dp"/>
 
     <EditText
@@ -34,6 +37,7 @@
         android:layout_height="wrap_content"
         android:hint="Extra Monthly Payment"
         android:inputType="numberDecimal"
+        android:background="@android:drawable/edit_text"
         android:layout_marginTop="8dp"/>
 
     <Button
