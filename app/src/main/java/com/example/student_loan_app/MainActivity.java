@@ -23,6 +23,8 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -54,36 +56,42 @@ public class MainActivity extends AppCompatActivity {
         textViewWelcome = findViewById(R.id.textViewWelcome);
         btnFinancialLiteracy = findViewById(R.id.btnFinancialLiteracy);
 
-        // Fetch user profile data from Firestore
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("profile")
-                .limit(1)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    if (!querySnapshot.isEmpty()) {
-                        DocumentSnapshot doc = querySnapshot.getDocuments().get(0);
+        // Get the current user from FirebaseAuth
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            String uid = currentUser.getUid();
+            // Fetch user profile data using the UID
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("profile")
+                    .document(uid)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            String firstName = documentSnapshot.getString("name");
+                            textViewWelcome.setText((firstName != null && !firstName.isEmpty())
+                                    ? "Welcome, " + firstName
+                                    : "Welcome, User");
 
-                        String firstName = doc.getString("name");
-                        textViewWelcome.setText((firstName != null && !firstName.isEmpty())
-                                ? "Welcome, " + firstName
-                                : "Welcome, User");
-
-                        // Retrieve loan details: full loan amount and total repaid
-                        Double fullLoanAmount = doc.getDouble("loanAmount");
-                        Double totalRepaid = doc.getDouble("totalRepaid");
-                        if (fullLoanAmount != null && totalRepaid != null) {
-                            fetchedFullLoanAmount = fullLoanAmount;
-                            fetchedTotalRepaid = totalRepaid;
-                            double remainingAmount = fetchedFullLoanAmount - fetchedTotalRepaid;
-                            textViewRemainingLoan.setText("$" + String.format("%.2f", remainingAmount));
-                            updateLoanPieChartData((float) fetchedTotalRepaid, (float) remainingAmount);
-                            loadDetailedLineChartData();
+                            // Retrieve loan details: full loan amount and total repaid
+                            Double fullLoanAmount = documentSnapshot.getDouble("loanAmount");
+                            Double totalRepaid = documentSnapshot.getDouble("totalRepaid");
+                            if (fullLoanAmount != null && totalRepaid != null) {
+                                fetchedFullLoanAmount = fullLoanAmount;
+                                fetchedTotalRepaid = totalRepaid;
+                                double remainingAmount = fetchedFullLoanAmount - fetchedTotalRepaid;
+                                textViewRemainingLoan.setText("$" + String.format("%.2f", remainingAmount));
+                                updateLoanPieChartData((float) fetchedTotalRepaid, (float) remainingAmount);
+                                loadDetailedLineChartData();
+                            }
+                        } else {
+                            Log.d("FirestoreTest", "No profile data found for UID: " + uid);
                         }
-                    } else {
-                        Log.d("FirestoreTest", "Connected, but no data found.");
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("FirestoreTest", "Connection failed", e));
+                    })
+                    .addOnFailureListener(e -> Log.e("FirestoreTest", "Connection failed", e));
+        } else {
+            Log.d("FirestoreTest", "User not signed in");
+            // Optionally, redirect to sign-in activity here
+        }
 
         // Bottom Navigation Listener
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
@@ -93,11 +101,13 @@ public class MainActivity extends AppCompatActivity {
                 if (id == R.id.navigation_home) {
                     return true;
                 } else if (id == R.id.navigation_repayment_planner) {
+                    startActivity(new Intent(MainActivity.this, RepaymentMenu.class));
                     return true;
                 } else if (id == R.id.navigation_budget) {
                     startActivity(new Intent(MainActivity.this, BudgetExpenseActivity.class));
                     return true;
                 } else if (id == R.id.navigation_notifications) {
+                    startActivity(new Intent(MainActivity.this, NotificationsActivity.class));
                     return true;
                 } else if (id == R.id.navigation_profile) {
                     startActivity(new Intent(MainActivity.this, ProfileActivity.class));

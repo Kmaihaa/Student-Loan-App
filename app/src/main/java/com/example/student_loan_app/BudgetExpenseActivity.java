@@ -113,7 +113,6 @@ public class BudgetExpenseActivity extends AppCompatActivity {
                     startActivity(new Intent(BudgetExpenseActivity.this, RepaymentMenu.class));
                     return true;
                 } else if (id == R.id.navigation_budget) {
-                    // We are already here
                     return true;
                 } else if (id == R.id.navigation_notifications) {
                     startActivity(new Intent(BudgetExpenseActivity.this, NotificationsActivity.class));
