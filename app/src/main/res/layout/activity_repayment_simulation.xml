@@ -16,6 +16,7 @@
         android:hint="Loan Amount"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:background="@android:drawable/edit_text"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <EditText
@@ -26,6 +27,7 @@
         android:hint="Interest Rate (%)"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:background="@android:drawable/edit_text"
         app:layout_constraintTop_toBottomOf="@id/etLoanAmount"/>
 
     <EditText
@@ -37,6 +39,7 @@
         android:layout_marginBottom="20dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:background="@android:drawable/edit_text"
         app:layout_constraintTop_toBottomOf="@id/etInterestRate"/>
 
     <Spinner
