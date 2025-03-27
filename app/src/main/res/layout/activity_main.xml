@@ -9,97 +9,72 @@
     tools:context=".MainActivity">
 
     <!-- Welcome Text -->
-
-    <!-- Progress Bar -->
     <TextView
         android:id="@+id/textViewWelcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
         android:layout_marginTop="16dp"
         android:text="Welcome User"
         android:textSize="48sp"
         android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <ProgressBar
-        android:id="@+id/progressBarDebtRepayment"
-        style="@style/Widget.MaterialComponents.LinearProgressIndicator"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:indeterminate="false"
-        android:progress="50"
-        android:max="100"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="8dp"
+    <!-- FrameLayout holding the PieChart and center text -->
+    <FrameLayout
+        android:id="@+id/frameLayoutPieChart"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toBottomOf="@id/textViewWelcome"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textViewWelcome"/>
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <!-- Pie Chart Image -->
-    <ImageView
-        android:id="@+id/imageViewPieChart"
-        android:layout_width="175dp"
-        android:layout_height="160dp"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/ic_pie_chart_placeholder"
-        app:layout_constraintTop_toBottomOf="@id/progressBarDebtRepayment"
-        app:layout_constraintStart_toStartOf="parent"/>
+        <!-- MPAndroidChart PieChart -->
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/pieChart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-    <!-- Balance Label -->
+        <!-- TextView overlay in the center -->
+        <TextView
+            android:id="@+id/textViewRemainingLoan"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="$10,000"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"/>
+    </FrameLayout>
 
-    <!-- Balance Amount -->
-
-    <TextView
-        android:id="@+id/textViewBalanceLabel"
+    <!-- Financial Literacy Button -->
+    <Button
+        android:id="@+id/btnFinancialLiteracy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
-        android:text="Balance"
-        android:textSize="32sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@id/imageViewPieChart"
-        app:layout_constraintTop_toTopOf="@id/imageViewPieChart" />
-
-    <!-- Eye Icon -->
-
-    <!-- Horizontal Progress Bar -->
-
-    <TextView
-        android:id="@+id/textViewBalanceAmount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="16dp"
-        android:text="$10000"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="@id/textViewBalanceLabel"
-        app:layout_constraintTop_toBottomOf="@id/textViewBalanceLabel" />
-
-    <ImageView
-        android:id="@+id/imageViewToggleBalance"
-        android:layout_width="30dp"
-        android:layout_height="29dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="4dp"
-        android:src="@drawable/ic_eye_open"
-        app:layout_constraintStart_toEndOf="@id/textViewBalanceAmount"
-        app:layout_constraintTop_toTopOf="@id/textViewBalanceAmount" />
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="0dp"
-        android:layout_height="68dp"
+        android:text="Financial Literacy Resources"
+        app:layout_constraintTop_toBottomOf="@id/frameLayoutPieChart"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/imageViewPieChart"
-        android:layout_margin="16dp"/>
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"/>
 
+    <!-- Line Chart for Loan Repayment Graph -->
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/lineChart"
+        android:layout_width="0dp"
+        android:layout_height="300dp"
+        android:layout_margin="16dp"
+        app:layout_constraintTop_toBottomOf="@id/btnFinancialLiteracy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Bottom Navigation -->
+
     <Button
         android:id="@+id/btnFinancialLiteracy"
         android:layout_width="wrap_content"
@@ -112,18 +87,17 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.499" />
 
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="?android:attr/windowBackground"
+        app:menu="@menu/bottom_nav_menu"
         app:itemIconTint="@color/nav_item_color"
         app:itemTextColor="@color/nav_item_color"
-        app:menu="@menu/bottom_nav_menu"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
