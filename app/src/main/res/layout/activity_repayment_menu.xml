@@ -24,8 +24,8 @@
         android:id="@+id/btnSimulation"
         android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:text="Repayment Simulation"
-        android:backgroundTint="@color/lavender"
+        android:text="💸Repayment Simulation"
+        android:backgroundTint="#4CAF50"
         android:layout_marginBottom="16dp"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,33 +36,36 @@
         android:id="@+id/btnExtraPayment"
         android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/lavender"
-        android:text="Extra Payments Simulation"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="#2196F3"
+        android:text="➕Extra Payments Simulation"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnSimulation"/>
+        app:layout_constraintHorizontal_bias="0.508"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnSimulation" />
 
     <Button
         android:id="@+id/btnGoalSetting"
         android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/lavender"
-        android:text="Goal Setting"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="#FFC107"
+        android:text="🎯Goal Setting"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnExtraPayment"/>
+        app:layout_constraintHorizontal_bias="0.491"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnExtraPayment" />
 
     <Button
         android:id="@+id/btnBackToHome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Back to Home"
-        android:backgroundTint="@color/nav_item_color"
-        android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="68dp"
+        android:backgroundTint="#607D8B"
+        android:text="⬅️ Back to Home"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnGoalSetting" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

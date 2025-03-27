@@ -59,7 +59,7 @@
         android:id="@+id/btnBackToMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Back to Menu"
+        android:text="⬅️ Back to Menu"
         android:backgroundTint="#607D8B"
         android:layout_marginLeft="120dp"
         android:layout_marginTop="16dp"/>

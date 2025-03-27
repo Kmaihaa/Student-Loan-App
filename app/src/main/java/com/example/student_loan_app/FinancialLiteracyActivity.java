@@ -2,14 +2,22 @@ package com.example.student_loan_app;
 
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.view.MenuItem;
 import android.widget.Button;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 
 public class FinancialLiteracyActivity extends AppCompatActivity {
 
     private Button btnEducationalContent;
     private Button btnInteractiveTools;
     private Button btnResourceHub; // NEW
+
 
     private Button btnBackToHome;
 
@@ -48,5 +56,6 @@ public class FinancialLiteracyActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+
     }
 }
